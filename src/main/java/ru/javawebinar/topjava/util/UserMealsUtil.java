@@ -29,11 +29,7 @@ public class UserMealsUtil {
     public static List<UserMealWithExceed>  getFilteredMealsWithExceeded(List<UserMeal> mealList, LocalTime startTime, LocalTime endTime, int caloriesPerDay) {
         Map<LocalDate, Integer> caloriesByDate = new HashMap<>();
         for (UserMeal userMeal : mealList){
-            LocalDate temp = userMeal.getDateTime().toLocalDate();
-            if (caloriesByDate.containsKey(temp)){
-                caloriesByDate.put(temp, caloriesByDate.get(temp) + userMeal.getCalories());
-            } else
-                caloriesByDate.put(temp, userMeal.getCalories());
+            caloriesByDate.merge(userMeal.getDateTime().toLocalDate(), userMeal.getCalories(), (x, y) -> (x + y));
         }
 
         List<UserMealWithExceed> mealWithExceedList = new ArrayList<>();
