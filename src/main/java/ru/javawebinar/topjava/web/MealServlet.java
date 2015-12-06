@@ -23,7 +23,7 @@ public class MealServlet extends HttpServlet{
         LocalDateTime date1 = LocalDateTime.MIN;
         LocalDateTime date2 = LocalDateTime.MAX;
 
-        String action = req.getParameter("action");
+        String action = (req.getParameter("action") == null) ? "default" :  req.getParameter("action");
 
         switch (action){
             case "delete": //удаление еды
@@ -55,6 +55,7 @@ public class MealServlet extends HttpServlet{
         LocalDateTime date1 = LocalDateTime.MIN;
         LocalDateTime date2 = LocalDateTime.MAX;
 
+        req.setCharacterEncoding("UTF-8");
         String action = req.getParameter("action");
 
         switch (action){
