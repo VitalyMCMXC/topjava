@@ -1,11 +1,12 @@
 package ru.javawebinar.topjava.model;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 /**
  * GKislin
  * 11.01.2015.
  */
-public class UserMealWithExceed {
+public class UserMealWithExceed implements Serializable{
 
     private LocalDateTime dateTime;
     private String description;

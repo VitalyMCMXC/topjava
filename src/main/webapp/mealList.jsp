@@ -55,12 +55,13 @@
     <tbody>
     <c:forEach items="${mealList}" var="entry">
         <c:forEach items="${entry.value}" var="umwe">
-            <tr class="${umwe.isExceed() ? 'redText' : 'greenText'}">
-                <c:url var="editUrl" value="meals?action=edit&date=${umwe.getDateTime()}&descr=${umwe.getDescription()}&calory=${umwe.getCalories()}" />
-                <c:url var="deleteUrl" value="meals?action=delete&date=${umwe.getDateTime()}&descr=${umwe.getDescription()}" />
-                <td> ${umwe.getDateTime()} </td>
-                <td> ${umwe.getDescription()} </td>
-                <td> ${umwe.getCalories()} </td>
+            <jsp:useBean id="umwe" class="ru.javawebinar.topjava.model.UserMealWithExceed" scope="page"/>
+            <tr class="${umwe.exceed ? 'redText' : 'greenText'}">
+                <c:url var="editUrl" value="meals?action=edit&date=${umwe.dateTime}&descr=${umwe.description}&calory=${umwe.calories}" />
+                <c:url var="deleteUrl" value="meals?action=delete&date=${umwe.dateTime}&descr=${umwe.description}" />
+                <td> ${umwe.dateTime} </td>
+                <td> ${umwe.description} </td>
+                <td> ${umwe.calories} </td>
                 <td><a href="${editUrl}">Edit</a></td>
                 <td><a href="${deleteUrl}">Delete</a></td>
             </tr>
