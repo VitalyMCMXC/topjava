@@ -9,9 +9,10 @@
 <h1 style="color:#d2691e">Add meal</h1>
 
 <form method="POST" action="meals?action=newMeal">
-    Date: <input type="text" name="date" value="${userMeal.getDateTime()}"/> Вводить в формате (2015-05-30T10:00)<br>
-    Description: <input type="text" name="descr" value="${userMeal.getDescription()}"/><br>
-    Calories: <input type="text" name="calory" value="${userMeal.getCalories()}"/><br>
+    <jsp:useBean id="userMeal" class="ru.javawebinar.topjava.model.UserMeal" scope="request"/>
+    Date:        <input type="datetime-local" name="date" value="${userMeal.dateTime}"/><br>
+    Description: <input type="text" name="descr" value="${userMeal.description}"/><br>
+    Calories:    <input type="number" name="calory" value="${userMeal.calories}" min="0"/><br>
     <input type="submit" value="Submit"/>
 </form>
 </body>

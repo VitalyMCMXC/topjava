@@ -1,18 +1,20 @@
 package ru.javawebinar.topjava.model;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
  * GKislin
  * 11.01.2015.
  */
-public class UserMeal {
-    protected final LocalDateTime dateTime;
+public class UserMeal implements Serializable{
 
-    protected final String description;
+    private LocalDateTime dateTime;
+    private String description;
+    private int calories;
 
-    protected final int calories;
-
+    public UserMeal() {
+    }
     public UserMeal(LocalDateTime dateTime, String description, int calories) {
         this.dateTime = dateTime;
         this.description = description;
@@ -22,11 +24,9 @@ public class UserMeal {
     public LocalDateTime getDateTime() {
         return dateTime;
     }
-
     public String getDescription() {
         return description;
     }
-
     public int getCalories() {
         return calories;
     }

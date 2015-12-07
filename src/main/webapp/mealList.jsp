@@ -74,10 +74,9 @@
 <p><a href="meal.jsp">Add Meal</a></p>
 <br>
 <form method="POST" action="meals?action=filter">
-    From date: <input type="text" name="date1" />
-    To date: <input type="text" name="date2" />
+    From date: <input type="datetime-local" name="date1" />
+    To date: <input type="datetime-local" name="date2" />
     <input type="submit" value="Submit"/>
-    <p>Вводить в формате (2015-05-30T10:00)</p>
 </form>
 </body>
 </html>
