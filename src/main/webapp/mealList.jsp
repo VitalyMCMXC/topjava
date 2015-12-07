@@ -54,9 +54,8 @@
     </thead>
     <tbody>
     <c:forEach items="${mealList}" var="entry">
-        <tr>
-            <c:forEach items="${entry.value}" var="umwe">
-                <tr class="${umwe.isExceed() ? 'redText' : 'greenText'}">
+        <c:forEach items="${entry.value}" var="umwe">
+            <tr class="${umwe.isExceed() ? 'redText' : 'greenText'}">
                 <c:url var="editUrl" value="meals?action=edit&date=${umwe.getDateTime()}&descr=${umwe.getDescription()}&calory=${umwe.getCalories()}" />
                 <c:url var="deleteUrl" value="meals?action=delete&date=${umwe.getDateTime()}&descr=${umwe.getDescription()}" />
                 <td> ${umwe.getDateTime()} </td>
@@ -64,9 +63,8 @@
                 <td> ${umwe.getCalories()} </td>
                 <td><a href="${editUrl}">Edit</a></td>
                 <td><a href="${deleteUrl}">Delete</a></td>
-                </tr>
-            </c:forEach>
-        </tr>
+            </tr>
+        </c:forEach>
     </c:forEach>
     </tbody>
 </table>
