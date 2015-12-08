@@ -1,7 +1,8 @@
 package ru.javawebinar.topjava.web;
 
 import ru.javawebinar.topjava.LoggerWrapper;
-import ru.javawebinar.topjava.util.UserMealsUtil;
+import ru.javawebinar.topjava.dao.DAO;
+import ru.javawebinar.topjava.dao.UserMealRepository;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -16,44 +17,40 @@ import java.time.format.DateTimeParseException;
  */
 public class MealServlet extends HttpServlet{
     private static final LoggerWrapper LOG = LoggerWrapper.get(MealServlet.class);
+    private DAO dao= new UserMealRepository();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         LOG.debug("return mealList");
-        LocalDateTime date1 = LocalDateTime.MIN;
-        LocalDateTime date2 = LocalDateTime.MAX;
+        LocalDateTime from = LocalDateTime.MIN;
+        LocalDateTime till = LocalDateTime.MAX;
 
         String action = (req.getParameter("action") == null) ? "default" :  req.getParameter("action");
 
         switch (action){
             case "delete": //удаление еды
                 try {
-                    UserMealsUtil.deleteMeal(LocalDateTime.parse(req.getParameter("date")), req.getParameter("descr"));
+                    dao.delete(Integer.parseInt(req.getParameter("id")));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                req.setAttribute("mealList", UserMealsUtil.getFilteredMeals(date1, date2));
+                req.setAttribute("mealList", dao.display(from, till));
                 req.getRequestDispatcher("/mealList.jsp").forward(req, resp);
                 break;
-            case "edit": //изменение
-                try {
-                    UserMealsUtil.deleteMeal(LocalDateTime.parse(req.getParameter("date")), req.getParameter("descr"));
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                req.setAttribute("userMeal", UserMealsUtil.newUserMeal(LocalDateTime.parse(req.getParameter("date")), req.getParameter("descr"), Integer.parseInt(req.getParameter("calory"))));
-                req.getRequestDispatcher("meal.jsp").forward(req, resp);
+            case "edit": // запрос на изменение
+                req.setAttribute("userMeal", dao.getUserMeal(Integer.parseInt(req.getParameter("id"))));
+                req.getRequestDispatcher("editMeal.jsp").forward(req, resp);
                 break;
             default:    //дефолт
-                req.setAttribute("mealList", UserMealsUtil.getFilteredMeals(date1, date2));
+                req.setAttribute("mealList", dao.display(from, till));
                 req.getRequestDispatcher("/mealList.jsp").forward(req, resp);
         }
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        LocalDateTime date1 = LocalDateTime.MIN;
-        LocalDateTime date2 = LocalDateTime.MAX;
+        LocalDateTime from = LocalDateTime.MIN;
+        LocalDateTime till = LocalDateTime.MAX;
 
         req.setCharacterEncoding("UTF-8");
         String action = req.getParameter("action");
@@ -61,25 +58,33 @@ public class MealServlet extends HttpServlet{
         switch (action){
             case "filter": //фильтрация по заданным датам
                 try {
-                    date1 = LocalDateTime.parse(req.getParameter("date1"));
+                    from = LocalDateTime.parse(req.getParameter("date1"));
                 } catch (NullPointerException | DateTimeParseException e){
-                    date1 = LocalDateTime.MIN;
+                    from = LocalDateTime.MIN;
                 }
                 try {
-                    date2 = LocalDateTime.parse(req.getParameter("date2"));
+                    till = LocalDateTime.parse(req.getParameter("date2"));
                 } catch (NullPointerException | DateTimeParseException e){
-                    date2 = LocalDateTime.MAX;
+                    till = LocalDateTime.MAX;
                 }
                 break;
             case "newMeal": //добавление еды
                 try {
-                    UserMealsUtil.addMeal(LocalDateTime.parse(req.getParameter("date")), req.getParameter("descr"), Integer.parseInt(req.getParameter("calory")));
+                    dao.create(LocalDateTime.parse(req.getParameter("date")), req.getParameter("descr"), Integer.parseInt(req.getParameter("calory")));
                 } catch (Exception e){
                     e.printStackTrace();
                 }
+                break;
+            case "edit": //изменение
+                try {
+                    dao.update(Integer.parseInt(req.getParameter("id")), LocalDateTime.parse(req.getParameter("date")), req.getParameter("descr"), Integer.parseInt(req.getParameter("calory")));
+                } catch (Exception e){
+                    e.printStackTrace();
+                }
+                break;
         }
 
-        req.setAttribute("mealList", UserMealsUtil.getFilteredMeals(date1, date2));
+        req.setAttribute("mealList", dao.display(from, till));
         req.getRequestDispatcher("/mealList.jsp").forward(req, resp);
     }
 }

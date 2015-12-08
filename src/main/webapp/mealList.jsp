@@ -53,24 +53,22 @@
     </tr>
     </thead>
     <tbody>
-    <c:forEach items="${mealList}" var="entry">
-        <c:forEach items="${entry.value}" var="umwe">
-            <jsp:useBean id="umwe" class="ru.javawebinar.topjava.model.UserMealWithExceed" scope="page"/>
+    <c:forEach items="${mealList}" var="umwe">
+        <jsp:useBean id="umwe" class="ru.javawebinar.topjava.model.UserMealWithExceed" scope="page"/>
             <tr class="${umwe.exceed ? 'redText' : 'greenText'}">
-                <c:url var="editUrl" value="meals?action=edit&date=${umwe.dateTime}&descr=${umwe.description}&calory=${umwe.calories}" />
-                <c:url var="deleteUrl" value="meals?action=delete&date=${umwe.dateTime}&descr=${umwe.description}" />
-                <td> ${umwe.dateTime} </td>
+                <c:url var="editUrl" value="meals?action=edit&id=${umwe.id}" />
+                <c:url var="deleteUrl" value="meals?action=delete&id=${umwe.id}" />
+                <td> ${umwe.dateTime.toLocalDate()} ${umwe.dateTime.toLocalTime()} </td>
                 <td> ${umwe.description} </td>
                 <td> ${umwe.calories} </td>
                 <td><a href="${editUrl}">Edit</a></td>
                 <td><a href="${deleteUrl}">Delete</a></td>
             </tr>
-        </c:forEach>
     </c:forEach>
     </tbody>
 </table>
 <br>
-<p><a href="meal.jsp">Add Meal</a></p>
+<p><a href="newMeal.jsp">Add Meal</a></p>
 <br>
 <form method="POST" action="meals?action=filter">
     From date: <input type="datetime-local" name="date1" />

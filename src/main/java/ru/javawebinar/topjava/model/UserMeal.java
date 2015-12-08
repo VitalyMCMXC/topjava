@@ -9,18 +9,23 @@ import java.time.LocalDateTime;
  */
 public class UserMeal implements Serializable{
 
+    private int id;
     private LocalDateTime dateTime;
     private String description;
     private int calories;
 
     public UserMeal() {
     }
-    public UserMeal(LocalDateTime dateTime, String description, int calories) {
+    public UserMeal(Integer id, LocalDateTime dateTime, String description, int calories) {
+        this.id = id;
         this.dateTime = dateTime;
         this.description = description;
         this.calories = calories;
     }
 
+    public int getId() {
+        return id;
+    }
     public LocalDateTime getDateTime() {
         return dateTime;
     }
@@ -29,5 +34,15 @@ public class UserMeal implements Serializable{
     }
     public int getCalories() {
         return calories;
+    }
+
+    @Override
+    public String toString() {
+        return "UserMeal{" +
+                "id=" + id +
+                "dateTime=" + dateTime +
+                ", description='" + description + '\'' +
+                ", calories=" + calories +
+                '}';
     }
 }
