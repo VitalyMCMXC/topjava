@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 /**
  * GKislin
@@ -30,8 +31,8 @@ public class InMemoryUserMealRepositoryImpl implements UserMealRepository {
     }
 
     @Override
-    public void delete(int id) {
-        repository.remove(id);
+    public boolean delete(int id) {
+        return !(repository.remove(id) == null); // false if not found
     }
 
     @Override
@@ -41,7 +42,8 @@ public class InMemoryUserMealRepositoryImpl implements UserMealRepository {
 
     @Override
     public Collection<UserMeal> getAll() {
-        return repository.values();
+        return repository.values().stream()
+                .sorted((um1, um2) -> um1.getDateTime().compareTo(um2.getDateTime()))
+                .collect(Collectors.toList());
     }
 }
-
