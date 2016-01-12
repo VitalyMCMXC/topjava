@@ -1,0 +1,32 @@
+Index: pom.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- pom.xml	(revision 81f56bc2013abb531ee9e9f9294309262deac791)
++++ pom.xml	(revision ae80b424d5745ca5f985689eb11964d2810a8eb5)
+@@ -20,7 +20,7 @@
+ 
+     <build>
+         <finalName>topjava</finalName>
+-        <defaultGoal>install</defaultGoal>
++        <defaultGoal>package</defaultGoal>
+         <plugins>
+             <plugin>
+                 <groupId>org.apache.maven.plugins</groupId>
+Index: src/main/java/ru/javawebinar/topjava/web/UserServlet.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/ru/javawebinar/topjava/web/UserServlet.java	(revision 81f56bc2013abb531ee9e9f9294309262deac791)
++++ src/main/java/ru/javawebinar/topjava/web/UserServlet.java	(revision ae80b424d5745ca5f985689eb11964d2810a8eb5)
+@@ -13,6 +13,7 @@
+ public class UserServlet extends HttpServlet {
+ 
+     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+-        request.getRequestDispatcher("/userList.jsp").forward(request, response);
++//        request.getRequestDispatcher("/userList.jsp").forward(request, response);
++        response.sendRedirect("userList.jsp");
+     }
+ }

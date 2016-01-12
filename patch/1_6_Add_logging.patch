@@ -1,0 +1,222 @@
+Index: config/tomcat/setenv.bat
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- config/tomcat/setenv.bat	(revision )
++++ config/tomcat/setenv.bat	(revision )
+@@ -0,0 +1,4 @@
++rem run tomcat with JMX ability
++rem Run Tomcat as admin
++rem for remote connection add -Djava.rmi.server.hostname=TomcatServer_IP
++set CATALINA_OPTS=-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=1099 -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=false
+Index: src/main/java/ru/javawebinar/topjava/LoggerWrapper.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/ru/javawebinar/topjava/LoggerWrapper.java	(revision )
++++ src/main/java/ru/javawebinar/topjava/LoggerWrapper.java	(revision )
+@@ -0,0 +1,72 @@
++package ru.javawebinar.topjava;
++
++import org.slf4j.Logger;
++import org.slf4j.LoggerFactory;
++
++/**
++ * User: gkislin
++ * Date: 22.01.14
++ */
++public class LoggerWrapper {
++
++    private Logger logger;
++
++    public LoggerWrapper(Logger logger) {
++        this.logger = logger;
++    }
++
++    public static LoggerWrapper get(Class aClass) {
++        return new LoggerWrapper(LoggerFactory.getLogger(aClass));
++    }
++
++    public void debug(String msg) {
++        logger.debug(msg);
++    }
++
++    public void info(String msg, Object... arguments) {
++        logger.info(msg, arguments);
++    }
++
++    public void warn(String msg) {
++        logger.warn(msg);
++    }
++
++    public void warn(String msg, Throwable t) {
++        logger.warn(msg, t);
++    }
++
++    public void error(String msg) {
++        logger.error(msg);
++    }
++
++    public void error(String msg, Throwable t) {
++        logger.error(msg, t);
++    }
++
++    public boolean isDebug() {
++        return logger.isDebugEnabled();
++    }
++
++    public IllegalStateException getIllegalStateException(String msg) {
++        return getIllegalStateException(msg, null);
++    }
++
++    public IllegalStateException getIllegalStateException(String msg, Throwable e) {
++        logger.error(msg, e);
++        return new IllegalStateException(msg, e);
++    }
++
++    public IllegalArgumentException getIllegalArgumentException(String msg) {
++        return getIllegalArgumentException(msg, null);
++    }
++
++    public IllegalArgumentException getIllegalArgumentException(String msg, Throwable e) {
++        logger.error(msg, e);
++        return new IllegalArgumentException(msg, e);
++    }
++
++    public UnsupportedOperationException getUnsupportedOperationException(String msg) {
++        logger.error(msg);
++        return new UnsupportedOperationException(msg);
++    }
++}
+Index: src/main/resources/logback.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/resources/logback.xml	(revision )
++++ src/main/resources/logback.xml	(revision )
+@@ -0,0 +1,33 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<configuration scan="true" scanPeriod="30 seconds">
++
++    <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator">
++        <resetJUL>true</resetJUL>
++    </contextListener>
++
++    <!-- To enable JMX Management -->
++    <jmxConfigurator/>
++
++    <appender name="file" class="ch.qos.logback.core.FileAppender">
++        <file>${TOPJAVA_ROOT}/log/topjava.log</file>
++
++        <encoder>
++            <charset>UTF-8</charset>
++            <pattern>%date %-5level %logger{0} [%file:%line] %msg%n</pattern>
++        </encoder>
++    </appender>
++
++    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
++        <encoder>
++            <charset>UTF-8</charset>
++            <pattern>%-5level %logger{0} [%file:%line] %msg%n</pattern>
++        </encoder>
++    </appender>
++
++    <logger name="ru.javawebinar.topjava" level="DEBUG"/>
++
++    <root level="INFO">
++        <appender-ref ref="file"/>
++        <appender-ref ref="console"/>
++    </root>
++</configuration>
+Index: src/main/java/ru/javawebinar/topjava/web/UserServlet.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/ru/javawebinar/topjava/web/UserServlet.java	(date 1449065029000)
++++ src/main/java/ru/javawebinar/topjava/web/UserServlet.java	(revision )
+@@ -1,5 +1,7 @@
+ package ru.javawebinar.topjava.web;
+ 
++import ru.javawebinar.topjava.LoggerWrapper;
++
+ import javax.servlet.ServletException;
+ import javax.servlet.http.HttpServlet;
+ import javax.servlet.http.HttpServletRequest;
+@@ -11,8 +13,11 @@
+  * Date: 19.08.2014
+  */
+ public class UserServlet extends HttpServlet {
++    private static final LoggerWrapper LOG = LoggerWrapper.get(UserServlet.class);
+ 
+     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
++        LOG.debug("redirect to userList");
++
+ //        request.getRequestDispatcher("/userList.jsp").forward(request, response);
+         response.sendRedirect("userList.jsp");
+     }
+Index: pom.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- pom.xml	(date 1449065029000)
++++ pom.xml	(revision )
+@@ -16,6 +16,10 @@
+ 
+         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
++
++        <!-- Logging -->
++        <logback.version>1.1.3</logback.version>
++        <slf4j.version>1.7.13</slf4j.version>
+     </properties>
+ 
+     <build>
+@@ -35,7 +39,35 @@
+     </build>
+ 
+     <dependencies>
++        <!-- Logging with SLF4J & LogBack -->
++        <dependency>
++            <groupId>org.slf4j</groupId>
++            <artifactId>slf4j-api</artifactId>
++            <version>${slf4j.version}</version>
++            <scope>compile</scope>
++        </dependency>
+ 
++        <dependency>
++            <groupId>org.slf4j</groupId>
++            <artifactId>jcl-over-slf4j</artifactId>
++            <version>${slf4j.version}</version>
++            <scope>runtime</scope>
++        </dependency>
++
++        <dependency>
++            <groupId>org.slf4j</groupId>
++            <artifactId>jul-to-slf4j</artifactId>
++            <version>${slf4j.version}</version>
++            <scope>runtime</scope>
++        </dependency>
++
++        <dependency>
++            <groupId>ch.qos.logback</groupId>
++            <artifactId>logback-classic</artifactId>
++            <version>${logback.version}</version>
++            <scope>runtime</scope>
++        </dependency>
++
+         <!--Web-->
+         <dependency>
+             <groupId>javax.servlet</groupId>
+@@ -43,6 +75,7 @@
+             <version>2.5</version>
+             <scope>provided</scope>
+         </dependency>
++
+     </dependencies>
+ 
+     <profiles>
