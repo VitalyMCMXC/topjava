@@ -1,0 +1,306 @@
+Index: src/main/java/ru/javawebinar/topjava/web/MealServlet.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/ru/javawebinar/topjava/web/MealServlet.java	(revision )
++++ src/main/java/ru/javawebinar/topjava/web/MealServlet.java	(revision )
+@@ -0,0 +1,25 @@
++package ru.javawebinar.topjava.web;
++
++import ru.javawebinar.topjava.LoggerWrapper;
++import ru.javawebinar.topjava.util.UserMealsUtil;
++
++import javax.servlet.ServletException;
++import javax.servlet.http.HttpServlet;
++import javax.servlet.http.HttpServletRequest;
++import javax.servlet.http.HttpServletResponse;
++import java.io.IOException;
++
++/**
++ * User: gkislin
++ * Date: 19.08.2014
++ */
++public class MealServlet extends HttpServlet {
++    private static final LoggerWrapper LOG = LoggerWrapper.get(MealServlet.class);
++
++    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
++        LOG.info("getAll");
++        request.setAttribute("mealList",
++                UserMealsUtil.getWithExceeded(UserMealsUtil.MEAL_LIST, 2000));
++        request.getRequestDispatcher("/mealList.jsp").forward(request, response);
++    }
++}
+Index: src/main/webapp/mealList.jsp
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/webapp/mealList.jsp	(revision )
++++ src/main/webapp/mealList.jsp	(revision )
+@@ -0,0 +1,41 @@
++<%@ page import="ru.javawebinar.topjava.util.TimeUtil" %>
++<%@ page contentType="text/html;charset=UTF-8" language="java" %>
++<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
++<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
++<html>
++<head>
++    <title>Meal list</title>
++    <style>
++        .normal {color: green;}
++        .exceeded {color: red;}
++    </style>
++</head>
++<body>
++<section>
++    <h2><a href="index.html">Home</a></h2>
++    <h3>Meal list</h3>
++    <hr>
++    <table border="1" cellpadding="8" cellspacing="0">
++        <thead>
++        <tr>
++            <th>Date</th>
++            <th>Description</th>
++            <th>Calories</th>
++        </tr>
++        </thead>
++        <c:forEach items="${mealList}" var="meal">
++            <jsp:useBean id="meal" scope="page" type="ru.javawebinar.topjava.model.UserMealWithExceed"/>
++            <tr class="${meal.exceed ? 'exceeded' : 'normal'}">
++                <td>
++                   <%--<fmt:parseDate value="${meal.dateTime}" pattern="y-M-dd'T'H:m" var="parsedDate"/>--%>
++                   <%--<fmt:formatDate value="${parsedDate}" pattern="yyyy.MM.dd HH:mm" />--%>
++                    <%=TimeUtil.toString(meal.getDateTime())%>
++                </td>
++                <td>${meal.description}</td>
++                <td>${meal.calories}</td>
++            </tr>
++        </c:forEach>
++    </table>
++</section>
++</body>
++</html>
+\ No newline at end of file
+Index: src/main/java/ru/javawebinar/topjava/util/UserMealsUtil.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/ru/javawebinar/topjava/util/UserMealsUtil.java	(date 1449065383000)
++++ src/main/java/ru/javawebinar/topjava/util/UserMealsUtil.java	(revision )
+@@ -15,49 +15,55 @@
+  * 31.05.2015.
+  */
+ public class UserMealsUtil {
+-    public static void main(String[] args) {
+-        List<UserMeal> mealList = Arrays.asList(
++    public static final List<UserMeal> MEAL_LIST = Arrays.asList(
+-                new UserMeal(LocalDateTime.of(2015, Month.MAY, 30, 10, 0), "Завтрак", 500),
+-                new UserMeal(LocalDateTime.of(2015, Month.MAY, 30, 13, 0), "Обед", 1000),
+-                new UserMeal(LocalDateTime.of(2015, Month.MAY, 30, 20, 0), "Ужин", 500),
+-                new UserMeal(LocalDateTime.of(2015, Month.MAY, 31, 10, 0), "Завтрак", 1000),
+-                new UserMeal(LocalDateTime.of(2015, Month.MAY, 31, 13, 0), "Обед", 500),
+-                new UserMeal(LocalDateTime.of(2015, Month.MAY, 31, 20, 0), "Ужин", 510)
+-        );
++            new UserMeal(LocalDateTime.of(2015, Month.MAY, 30, 10, 0), "Завтрак", 500),
++            new UserMeal(LocalDateTime.of(2015, Month.MAY, 30, 13, 0), "Обед", 1000),
++            new UserMeal(LocalDateTime.of(2015, Month.MAY, 30, 20, 0), "Ужин", 500),
++            new UserMeal(LocalDateTime.of(2015, Month.MAY, 31, 10, 0), "Завтрак", 1000),
++            new UserMeal(LocalDateTime.of(2015, Month.MAY, 31, 13, 0), "Обед", 500),
++            new UserMeal(LocalDateTime.of(2015, Month.MAY, 31, 20, 0), "Ужин", 510)
++    );
+-        List<UserMealWithExceed> filteredMealsWithExceeded = getFilteredMealsWithExceeded(mealList, LocalTime.of(7, 0), LocalTime.of(12, 0), 2000);
++
++    public static void main(String[] args) {
++        List<UserMealWithExceed> filteredMealsWithExceeded = getFilteredWithExceeded(MEAL_LIST, LocalTime.of(7, 0), LocalTime.of(12, 0), 2000);
+         filteredMealsWithExceeded.forEach(System.out::println);
+ 
+-        System.out.println(getFilteredMealsWithExceededByCycle(mealList, LocalTime.of(7, 0), LocalTime.of(12, 0), 2000));
++        System.out.println(getFilteredWithExceededByCycle(MEAL_LIST, LocalTime.of(7, 0), LocalTime.of(12, 0), 2000));
+     }
+ 
+-    public static List<UserMealWithExceed> getFilteredMealsWithExceeded(List<UserMeal> mealList, LocalTime startTime, LocalTime endTime, int caloriesPerDay) {
+-        Map<LocalDate, Integer> caloriesSumByDate = mealList.stream().collect(Collectors.groupingBy(um -> um.getDateTime().toLocalDate(),
++    public static List<UserMealWithExceed> getWithExceeded(List<UserMeal> mealList, int caloriesPerDay) {
++        return getFilteredWithExceeded(mealList, LocalTime.MIN, LocalTime.MAX, caloriesPerDay);
++    }
++
++    public static UserMealWithExceed createWithExceed(UserMeal um, boolean exceeded) {
++        return new UserMealWithExceed(um.getDateTime(), um.getDescription(), um.getCalories(), exceeded);
++    }
++
++    public static List<UserMealWithExceed> getFilteredWithExceeded(List<UserMeal> mealList, LocalTime startTime, LocalTime endTime, int caloriesPerDay) {
++        Map<LocalDate, Integer> caloriesSumByDate = mealList.stream()
++                .collect(Collectors.groupingBy(um -> um.getDateTime().toLocalDate(),
+                 Collectors.summingInt(UserMeal::getCalories)));
+ 
+         return mealList.stream()
+                 .filter(um -> TimeUtil.isBetween(um.getDateTime().toLocalTime(), startTime, endTime))
+-                .map(um -> new UserMealWithExceed(um.getDateTime(), um.getDescription(), um.getCalories(),
+-                        caloriesSumByDate.get(um.getDateTime().toLocalDate()) > caloriesPerDay))
++                .map(um -> createWithExceed(um, caloriesSumByDate.get(um.getDateTime().toLocalDate()) > caloriesPerDay))
+                 .collect(Collectors.toList());
+     }
+ 
+-    public static List<UserMealWithExceed> getFilteredMealsWithExceededByCycle(List<UserMeal> mealList, LocalTime startTime, LocalTime endTime, int caloriesPerDay) {
++    public static List<UserMealWithExceed> getFilteredWithExceededByCycle(List<UserMeal> mealList, LocalTime startTime, LocalTime endTime, int caloriesPerDay) {
+ 
+         Map<LocalDate, Integer> caloriesSumPerDate = new HashMap<>();
+         for (UserMeal meal : mealList) {
+-            LocalDate mealDate = meal.getDateTime().toLocalDate();
+-            caloriesSumPerDate.put(mealDate, caloriesSumPerDate.merge(mealDate, 0, (oldValue, newValue) -> oldValue + newValue));
++            caloriesSumPerDate.merge(meal.getDateTime().toLocalDate(), meal.getCalories(), Integer::sum);
+         }
+ 
+         List<UserMealWithExceed> mealExceeded = new ArrayList<>();
+         for (UserMeal meal : mealList) {
+             LocalDateTime dateTime = meal.getDateTime();
+             if (TimeUtil.isBetween(dateTime.toLocalTime(), startTime, endTime)) {
+-                mealExceeded.add(new UserMealWithExceed(dateTime, meal.getDescription(), meal.getCalories(),
+-                        caloriesSumPerDate.get(dateTime.toLocalDate()) > caloriesPerDay));
++                mealExceeded.add(createWithExceed(meal, caloriesSumPerDate.get(dateTime.toLocalDate()) > caloriesPerDay));
+             }
+         }
+         return mealExceeded;
+     }
+-
+ }
+Index: src/main/java/ru/javawebinar/topjava/model/UserMealWithExceed.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/ru/javawebinar/topjava/model/UserMealWithExceed.java	(date 1449065383000)
++++ src/main/java/ru/javawebinar/topjava/model/UserMealWithExceed.java	(revision )
+@@ -22,6 +22,22 @@
+         this.exceed = exceed;
+     }
+ 
++    public LocalDateTime getDateTime() {
++        return dateTime;
++    }
++
++    public String getDescription() {
++        return description;
++    }
++
++    public int getCalories() {
++        return calories;
++    }
++
++    public boolean isExceed() {
++        return exceed;
++    }
++
+     @Override
+     public String toString() {
+         return "UserMealWithExceed{" +
+Index: src/main/java/ru/javawebinar/topjava/util/TimeUtil.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/ru/javawebinar/topjava/util/TimeUtil.java	(date 1449065383000)
++++ src/main/java/ru/javawebinar/topjava/util/TimeUtil.java	(revision )
+@@ -1,13 +1,21 @@
+ package ru.javawebinar.topjava.util;
+ 
++import java.time.LocalDateTime;
+ import java.time.LocalTime;
++import java.time.format.DateTimeFormatter;
+ 
+ /**
+  * GKislin
+  * 07.01.2015.
+  */
+ public class TimeUtil {
++    public static final DateTimeFormatter DATE_TME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
++
+     public static boolean isBetween(LocalTime lt, LocalTime startTime, LocalTime endTime) {
+         return lt.compareTo(startTime) >= 0 && lt.compareTo(endTime) <= 0;
++    }
++
++    public static String toString(LocalDateTime ldt) {
++        return ldt == null ? "" : ldt.format(DATE_TME_FORMATTER);
+     }
+ }
+Index: pom.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- pom.xml	(date 1449065383000)
++++ pom.xml	(revision )
+@@ -76,6 +76,12 @@
+             <scope>provided</scope>
+         </dependency>
+ 
++        <dependency>
++            <groupId>javax.servlet</groupId>
++            <artifactId>jstl</artifactId>
++            <version>1.2</version>
++        </dependency>
++
+     </dependencies>
+ 
+     <profiles>
+Index: src/main/webapp/WEB-INF/web.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/webapp/WEB-INF/web.xml	(date 1449065383000)
++++ src/main/webapp/WEB-INF/web.xml	(revision )
+@@ -15,4 +15,14 @@
+         <url-pattern>/users</url-pattern>
+     </servlet-mapping>
+ 
++    <servlet>
++        <servlet-name>mealServlet</servlet-name>
++        <servlet-class>ru.javawebinar.topjava.web.MealServlet</servlet-class>
++        <load-on-startup>0</load-on-startup>
++    </servlet>
++    <servlet-mapping>
++        <servlet-name>mealServlet</servlet-name>
++        <url-pattern>/meals</url-pattern>
++    </servlet-mapping>
++
+ </web-app>
+Index: src/main/webapp/index.html
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/webapp/index.html	(date 1449065383000)
++++ src/main/webapp/index.html	(revision )
+@@ -5,6 +5,11 @@
+     <title>Top Java.</title>
+ </head>
+ <body>
+-<h2>Приложение вебинара "<a href="http://javawebinar.ru/topjava/" target="_blank">Top Java."</a></h2>
++<h2>Проект "<a href="https://github.com/JavaWebinar/topjava05" target="_blank">Top Java"</a></h2>
++<hr>
++<ul>
++<li><a href="users">User List</a></li>
++<li><a href="meals">Meal List</a></li>
++</ul>
+ </body>
+-</html>
+\ No newline at end of file
++</html>
+Index: src/main/webapp/userList.jsp
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/webapp/userList.jsp	(date 1449065383000)
++++ src/main/webapp/userList.jsp	(revision )
+@@ -4,6 +4,7 @@
+     <title>User list</title>
+ </head>
+ <body>
+-<h2>User list</h2>
++<h2><a href="index.html">Home</a></h2>
++<h3>User list</h3>
+ </body>
+ </html>
