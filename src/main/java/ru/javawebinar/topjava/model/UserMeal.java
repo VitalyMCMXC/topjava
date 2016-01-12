@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
  */
 public class UserMeal {
 
-    User userId;
+    protected Integer userId;
 
     protected Integer id;
 
@@ -18,22 +18,23 @@ public class UserMeal {
 
     protected final int calories;
 
-    public UserMeal(LocalDateTime dateTime, String description, int calories) {
-        this(null, dateTime, description, calories);
+    public UserMeal(Integer userId, LocalDateTime dateTime, String description, int calories) {
+        this(userId, null, dateTime, description, calories);
     }
 
-    public UserMeal(Integer id, LocalDateTime dateTime, String description, int calories) {
+    public UserMeal(Integer userId, Integer id, LocalDateTime dateTime, String description, int calories) {
+        this.userId = userId;
         this.id = id;
         this.dateTime = dateTime;
         this.description = description;
         this.calories = calories;
     }
 
-    public User getUserId() {
+    public int getUserId() {
         return userId;
     }
 
-    public void setUserId(User userId) {
+    public void setUserId(Integer userId) {
         this.userId = userId;
     }
 

@@ -16,6 +16,30 @@
     <h3>Meal list</h3>
     <a href="meals?action=create">Add Meal</a>
     <hr>
+    <form method="get">
+        <table>
+            <tbody>
+            <tr>
+                <td>
+                    From Date: <input type="date" name="fromDate">
+                </td>
+                <td>
+                    To Date: <input type="date" name="toDate">
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    From Time: <input type="time" name="fromTime">
+                </td>
+                <td>
+                    To Time: <input type="time" name="toTime">
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <button type="submit">Filter</button>
+    </form>
+    <hr>
     <table border="1" cellpadding="8" cellspacing="0">
         <thead>
         <tr>
