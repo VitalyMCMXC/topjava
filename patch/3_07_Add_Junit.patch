@@ -1,0 +1,190 @@
+Index: src/test/java/ru/javawebinar/topjava/web/AdminInMemoryTest.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/test/java/ru/javawebinar/topjava/web/AdminInMemoryTest.java	(revision )
++++ src/test/java/ru/javawebinar/topjava/web/AdminInMemoryTest.java	(revision )
+@@ -0,0 +1,55 @@
++package ru.javawebinar.topjava.web;
++
++import org.junit.*;
++import org.springframework.context.ConfigurableApplicationContext;
++import org.springframework.context.support.ClassPathXmlApplicationContext;
++import ru.javawebinar.topjava.UserTestData;
++import ru.javawebinar.topjava.model.User;
++import ru.javawebinar.topjava.repository.UserRepository;
++import ru.javawebinar.topjava.util.exception.NotFoundException;
++import ru.javawebinar.topjava.web.user.AdminRestController;
++
++import java.util.Arrays;
++import java.util.Collection;
++
++import static ru.javawebinar.topjava.UserTestData.ADMIN;
++import static ru.javawebinar.topjava.UserTestData.USER;
++
++public class AdminInMemoryTest {
++    private static ConfigurableApplicationContext appCtx;
++    private static AdminRestController controller;
++
++    @BeforeClass
++    public static void beforeClass() {
++        appCtx = new ClassPathXmlApplicationContext("spring/spring-app.xml");
++        System.out.println("\n" + Arrays.toString(appCtx.getBeanDefinitionNames()) + "\n");
++        controller = appCtx.getBean(AdminRestController.class);
++    }
++
++    @Before
++    public void setUp() throws Exception {
++        // Re-initialize
++        UserRepository repository = appCtx.getBean(UserRepository.class);
++        repository.getAll().forEach(u -> repository.delete(u.getId()));
++        repository.save(USER);
++        repository.save(ADMIN);
++    }
++
++    @AfterClass
++    public static void afterClass() {
++        appCtx.close();
++    }
++
++    @Test
++    public void testDelete() throws Exception {
++        controller.delete(UserTestData.USER_ID);
++        Collection<User> users = controller.getAll();
++        Assert.assertEquals(users.size(), 1);
++        Assert.assertEquals(users.iterator().next(), ADMIN);
++    }
++
++    @Test(expected = NotFoundException.class)
++    public void testDeleteNotFound() throws Exception {
++        controller.delete(10);
++    }
++}
+\ No newline at end of file
+Index: src/test/java/ru/javawebinar/topjava/UserTestData.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/test/java/ru/javawebinar/topjava/UserTestData.java	(revision )
++++ src/test/java/ru/javawebinar/topjava/UserTestData.java	(revision )
+@@ -0,0 +1,16 @@
++package ru.javawebinar.topjava;
++
++import ru.javawebinar.topjava.model.Role;
++import ru.javawebinar.topjava.model.User;
++
++/**
++ * GKislin
++ * 24.09.2015.
++ */
++public class UserTestData {
++    public static final int USER_ID = 1;
++    public static final int ADMIN_ID = 2;
++
++    public static final User USER = new User(1, "User", "user@yandex.ru", "password", Role.ROLE_USER);
++    public static final User ADMIN = new User(2, "Admin", "admin@gmail.com", "admin", Role.ROLE_ADMIN);
++}
+Index: src/main/java/ru/javawebinar/topjava/LoggerWrapper.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/ru/javawebinar/topjava/LoggerWrapper.java	(date 1450313008000)
++++ src/main/java/ru/javawebinar/topjava/LoggerWrapper.java	(revision )
+@@ -72,7 +72,7 @@
+     }
+ 
+     public NotFoundException getNotFoundException(String reason) {
+-        logger.error("No data found");
++        logger.error(reason);
+         return new NotFoundException(reason);
+     }
+ }
+\ No newline at end of file
+Index: src/main/java/ru/javawebinar/topjava/repository/mock/InMemoryUserMealRepositoryImpl.java
+===================================================================
+--- src/main/java/ru/javawebinar/topjava/repository/mock/InMemoryUserMealRepositoryImpl.java	(date 1450313008000)
++++ src/test/java/ru/javawebinar/topjava/repository/mock/InMemoryUserMealRepositoryImpl.java	(revision )
+@@ -13,8 +13,8 @@
+ import java.util.concurrent.atomic.AtomicInteger;
+ import java.util.stream.Collectors;
+ 
+-import static ru.javawebinar.topjava.repository.mock.InMemoryUserRepositoryImpl.ADMIN_ID;
+-import static ru.javawebinar.topjava.repository.mock.InMemoryUserRepositoryImpl.USER_ID;
++import static ru.javawebinar.topjava.UserTestData.ADMIN_ID;
++import static ru.javawebinar.topjava.UserTestData.USER_ID;
+ 
+ /**
+  * GKislin
+@@ -82,4 +82,4 @@
+                 .filter(um -> TimeUtil.isBetween(um.getDateTime(), startDateTime, endDateTime))
+                 .collect(Collectors.toList());
+     }
+-}
++}
+\ No newline at end of file
+Index: pom.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- pom.xml	(date 1450313008000)
++++ pom.xml	(revision )
+@@ -22,6 +22,8 @@
+         <!-- Logging -->
+         <logback.version>1.1.3</logback.version>
+         <slf4j.version>1.7.13</slf4j.version>
++        <!--    Tests  -->
++        <junit.version>4.12</junit.version>
+     </properties>
+ 
+     <build>
+@@ -95,6 +97,14 @@
+                     <artifactId>commons-logging</artifactId>
+                 </exclusion>
+             </exclusions>
++        </dependency>
++
++        <!--Test-->
++        <dependency>
++            <groupId>junit</groupId>
++            <artifactId>junit</artifactId>
++            <version>${junit.version}</version>
++            <scope>test</scope>
+         </dependency>
+     </dependencies>
+ 
+Index: src/main/java/ru/javawebinar/topjava/repository/mock/InMemoryUserRepositoryImpl.java
+===================================================================
+--- src/main/java/ru/javawebinar/topjava/repository/mock/InMemoryUserRepositoryImpl.java	(date 1450313008000)
++++ src/test/java/ru/javawebinar/topjava/repository/mock/InMemoryUserRepositoryImpl.java	(revision )
+@@ -2,7 +2,6 @@
+ 
+ import org.springframework.stereotype.Repository;
+ import ru.javawebinar.topjava.LoggerWrapper;
+-import ru.javawebinar.topjava.model.Role;
+ import ru.javawebinar.topjava.model.User;
+ import ru.javawebinar.topjava.repository.UserRepository;
+ 
+@@ -28,14 +27,6 @@
+     private AtomicInteger counter = new AtomicInteger(0);
+ 
+     public static final Comparator<User> USER_COMPARATOR = (u1, u2) -> u1.getName().compareTo(u2.getName());
+-
+-    public static final int USER_ID = 1;
+-    public static final int ADMIN_ID = 2;
+-
+-    {
+-        save(new User(USER_ID, "User", "user@yandex.ru", "password", Role.ROLE_USER));
+-        save(new User(ADMIN_ID, "Admin", "admin@gmail.com", "admin", Role.ROLE_ADMIN));
+-    }
+ 
+     @PostConstruct
+     public void postConstruct() {
+Index: src/main/java/ru/javawebinar/topjava/SpringMain.java
+===================================================================
+--- src/main/java/ru/javawebinar/topjava/SpringMain.java	(date 1450313008000)
++++ src/test/java/ru/javawebinar/topjava/SpringMain.java	(revision )
+@@ -1,0 +1,0 @@

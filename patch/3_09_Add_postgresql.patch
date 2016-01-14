@@ -1,0 +1,36 @@
+Index: src/main/resources/db/postgres.properties
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>NATIVE_TO_ASCII_UTF-8
+===================================================================
+--- src/main/resources/db/postgres.properties	(revision )
++++ src/main/resources/db/postgres.properties	(revision )
+@@ -0,0 +1,7 @@
++#database.url=jdbc:postgresql://ec2-54-217-202-110.eu-west-1.compute.amazonaws.com:5432/dehm6lvm8bink0?ssl=true&sslfactory=org.postgresql.ssl.NonValidatingFactory
++#database.username=wegxlfzjjgxaxy
++#database.password=SSQyKKE_e93kiUCR-ehzMcKCxZ
++
++database.url=jdbc:postgresql://localhost:5432/topjava
++database.username=user
++database.password=password
+Index: pom.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- pom.xml	(date 1450314546000)
++++ pom.xml	(revision )
+@@ -99,6 +99,13 @@
+             </exclusions>
+         </dependency>
+ 
++        <!--DataBase-->
++        <dependency>
++            <groupId>org.postgresql</groupId>
++            <artifactId>postgresql</artifactId>
++            <version>9.4-1206-jdbc42</version>
++        </dependency>
++
+         <!--Test-->
+         <dependency>
+             <groupId>junit</groupId>
