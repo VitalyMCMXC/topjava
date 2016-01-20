@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 
 /**
@@ -47,7 +48,7 @@ public class MealServlet extends HttpServlet {
         if (action == null) {
             String id = request.getParameter("id");
             UserMeal userMeal = new UserMeal(id.isEmpty() ? null : Integer.valueOf(id),
-                    LocalDateTime.parse(request.getParameter("dateTime")),
+                    LocalDateTime.parse(request.getParameter("dateTime")).truncatedTo(ChronoUnit.MINUTES),
                     request.getParameter("description"),
                     Integer.valueOf(request.getParameter("calories")));
             if (userMeal.isNew()) {
@@ -58,7 +59,7 @@ public class MealServlet extends HttpServlet {
                 mealController.update(userMeal);
             }
             response.sendRedirect("meals");
-        } else if (action.equals("filter")) {
+        } else if (action.contains("filter")) {
             LocalDate startDate = TimeUtil.parseLocalDate(resetParam("startDate", request), TimeUtil.MIN_DATE);
             LocalDate endDate = TimeUtil.parseLocalDate(resetParam("endDate", request), TimeUtil.MAX_DATE);
             LocalTime startTime = TimeUtil.parseLocalTime(resetParam("startTime", request), LocalTime.MIN);
@@ -88,7 +89,7 @@ public class MealServlet extends HttpServlet {
             response.sendRedirect("meals");
         } else {
             final UserMeal meal = action.equals("create") ?
-                    new UserMeal(LocalDateTime.now(), "", 1000) :
+                    new UserMeal(LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES), "", 1000) :
                     mealController.get(getId(request));
             request.setAttribute("meal", meal);
             request.getRequestDispatcher("mealEdit.jsp").forward(request, response);
