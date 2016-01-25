@@ -24,6 +24,7 @@ public class UserTestData {
 
     public static final ModelMatcher<User, TestUser> MATCHER = new ModelMatcher<>(u -> ((u instanceof TestUser) ? (TestUser) u : new TestUser(u)));
 
+
     public static class TestUser extends User {
 
         public TestUser(User u) {
