@@ -14,7 +14,8 @@ INSERT INTO user_roles (role, user_id) VALUES
   ('ROLE_ADMIN', 100001);
 
 INSERT INTO meals (userId, datetime, description, calories ) VALUES
-  (100000, make_timestamp(2015, 12, 31, 09, 00, 00), 'Завтрак', 500);
+  (100000, make_timestamp(2015, 12, 31, 9, 00, 00), 'Завтрак', 500),
+  (100000, make_timestamp(2015, 12, 31, 14, 00, 00), 'Обед', 999);
   /*(100000, localtimestamp, 'Обед', 1000),
   (100000, localtimestamp, 'Ужин', 500),
   (100000, make_timestamp(2015, 12, 31, 09, 00, 00), 'Завтрак', 500),

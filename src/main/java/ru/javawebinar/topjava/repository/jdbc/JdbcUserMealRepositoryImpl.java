@@ -65,7 +65,7 @@ public class JdbcUserMealRepositoryImpl implements UserMealRepository {
 
     @Override
     public boolean delete(int id, int userId) {
-        return jdbcTemplate.update("DELETE FROM meals WHERE id=?", id) != 0;
+        return jdbcTemplate.update("DELETE FROM meals WHERE id=? AND userid=?", id, userId) != 0;
     }
 
     @Override
@@ -81,7 +81,7 @@ public class JdbcUserMealRepositoryImpl implements UserMealRepository {
 
     @Override
     public List<UserMeal> getBetween(LocalDateTime startDate, LocalDateTime endDate, int userId) {
-        return jdbcTemplate.query("SELECT * FROM meals WHERE userid=? AND datetime <=? AND datetime >= ?",
+        return jdbcTemplate.query("SELECT * FROM meals WHERE userid=? AND datetime >=? AND datetime <= ?",
                 ROW_MAPPER, userId, Timestamp.valueOf(startDate), Timestamp.valueOf(endDate));
     }
 }

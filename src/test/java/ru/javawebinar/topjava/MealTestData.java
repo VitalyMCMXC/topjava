@@ -13,40 +13,12 @@ import static ru.javawebinar.topjava.model.BaseEntity.START_SEQ;
  */
 public class MealTestData {
 
-    public static final int MEAL_ID = START_SEQ + 2;
-
     public static final ModelMatcher<UserMeal, String> MATCHER = new ModelMatcher<>(UserMeal::toString);
 
-    public static final UserMeal MEAL = new UserMeal(MEAL_ID, LocalDateTime.of(2015, 12, 31, 9, 0), "Завтрак", 500);
+    public static final int MEAL_1_ID = START_SEQ + 2;
+    public static final int MEAL_2_ID = START_SEQ + 3;
 
+    public static final UserMeal MEAL_1 = new UserMeal(MEAL_1_ID, LocalDateTime.of(2015, 12, 31, 9, 0), "Завтрак", 500);
+    public static final UserMeal MEAL_2 = new UserMeal(MEAL_2_ID, LocalDateTime.of(2015, 12, 31, 14, 0), "Обед", 999);
 
-    public static class TestMeal extends UserMeal{
-
-        public TestMeal(UserMeal um){
-            this(um.getId(), um.getDateTime(), um.getDescription(), um.getCalories());
-        }
-
-        public TestMeal(LocalDateTime dateTime, String description, int calories) {
-            this(null, dateTime, description, calories);
-        }
-
-        public TestMeal(Integer id, LocalDateTime dateTime, String description, int calories) {
-            super(id, dateTime, description, calories);
-        }
-
-
-        public UserMeal asMeal(){
-            return new UserMeal(this);
-        }
-
-        @Override
-        public String toString() {
-            return "UserMeal{" +
-                    "id=" + id +
-                    ", dateTime=" + dateTime +
-                    ", description='" + description + '\'' +
-                    ", calories=" + calories +
-                    '}';
-        }
-    }
 }
