@@ -14,7 +14,6 @@ import java.time.LocalDateTime;
         @NamedQuery(name = UserMeal.GET, query = "SELECT um FROM UserMeal um WHERE um.id=:id AND um.user.id=:userid"),
         @NamedQuery(name = UserMeal.ALL_SORTED, query = "SELECT um FROM UserMeal um WHERE um.user.id=:userid ORDER BY um.dateTime DESC"),
         @NamedQuery(name = UserMeal.DELETE, query = "DELETE FROM UserMeal um WHERE um.id=:id AND um.user.id=:userid"),
-        @NamedQuery(name = UserMeal.SET_userId, query = "UPDATE UserMeal um SET um.user.id=:userid WHERE um.id=:id"),
         @NamedQuery(name = UserMeal.BETWEEN, query = "SELECT um FROM UserMeal um " +
                 "WHERE um.user.id=:userid AND um.dateTime>=:startDate AND um.dateTime<=:endDate ORDER BY um.dateTime DESC")
 })
@@ -26,7 +25,6 @@ public class UserMeal extends BaseEntity {
     public static final String GET = "UserMeal.get";
     public static final String ALL_SORTED = "UserMeal.getAllSorted";
     public static final String DELETE = "UserMeal.delete";
-    public static final String SET_userId = "UserMeal.getUserId";
     public static final String BETWEEN = "UserMeal.getBetween";
 
     @Column(name = "date_time", nullable = false)
@@ -94,6 +92,10 @@ public class UserMeal extends BaseEntity {
 
     public User getUser() {
         return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
     @Override

@@ -27,19 +27,15 @@ public class JpaUserMealRepositoryImpl implements UserMealRepository {
     @Transactional
     public UserMeal save(UserMeal userMeal, int userId) {
         if (userMeal.isNew()){
+            User ref = em.getReference(User.class, userId);
+            userMeal.setUser(ref);
             em.persist(userMeal);
-            em.createNamedQuery(UserMeal.SET_userId).
-                    setParameter("userid", userId).
-                    setParameter("id", userMeal.getId()).
-                    executeUpdate();
             return userMeal;
         } else {
             UserMeal um = get(userMeal.getId(), userId);
+            User ref = em.getReference(User.class, userId);
+            userMeal.setUser(ref);
             em.merge(userMeal);
-            em.createNamedQuery(UserMeal.SET_userId).
-                    setParameter("userid", userId).
-                    setParameter("id", userMeal.getId()).
-                    executeUpdate();
             return userMeal;
         }
     }
