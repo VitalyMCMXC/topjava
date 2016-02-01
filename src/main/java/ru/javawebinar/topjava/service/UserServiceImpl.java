@@ -9,7 +9,6 @@ import ru.javawebinar.topjava.repository.UserRepository;
 import ru.javawebinar.topjava.util.exception.ExceptionUtil;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 
-import java.util.Collection;
 import java.util.Objects;
 import java.util.List;
 
