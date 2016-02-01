@@ -15,7 +15,7 @@ import java.util.List;
  */
 
 @Repository
-public class DataJpaUserMealRepositoryImpl implements UserMealRepository{
+public class DataJpaUserMealRepositoryImpl implements UserMealRepository {
 
     @Autowired
     private ProxyUserMealRepository proxy;
@@ -27,7 +27,12 @@ public class DataJpaUserMealRepositoryImpl implements UserMealRepository{
     public UserMeal save(UserMeal userMeal, int userId) {
         User ref = userProxy.getOne(userId);
         userMeal.setUser(ref);
-        return proxy.get(userMeal.getId(), userId) == null ? null : proxy.save(userMeal);
+
+        if (userMeal.isNew()){
+            return proxy.save(userMeal);
+        } else {
+            return proxy.get(userMeal.getId(), userId) == null ? null : proxy.save(userMeal);
+        }
     }
 
     @Override
