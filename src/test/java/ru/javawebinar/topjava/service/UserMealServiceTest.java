@@ -6,6 +6,7 @@ import org.junit.rules.ExpectedException;
 import org.junit.rules.Stopwatch;
 import org.junit.runner.Description;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
@@ -14,17 +15,19 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import ru.javawebinar.topjava.LoggerWrapper;
 import ru.javawebinar.topjava.MealTestData;
 import ru.javawebinar.topjava.Profiles;
+import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.model.UserMeal;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
 import static ru.javawebinar.topjava.MealTestData.*;
-import static ru.javawebinar.topjava.UserTestData.ADMIN_ID;
-import static ru.javawebinar.topjava.UserTestData.USER_ID;
+import static ru.javawebinar.topjava.UserTestData.*;
 
 @ContextConfiguration({
         "classpath:spring/spring-app.xml",
@@ -34,6 +37,7 @@ import static ru.javawebinar.topjava.UserTestData.USER_ID;
 @Sql(scripts = "classpath:db/populateDB.sql", config = @SqlConfig(encoding = "UTF-8"))
 @ActiveProfiles(Profiles.DATAJPA)
 public class UserMealServiceTest extends ServiceTest {
+
     private static final LoggerWrapper LOG = LoggerWrapper.get(UserMealServiceTest.class);
 
     @Rule
@@ -53,6 +57,25 @@ public class UserMealServiceTest extends ServiceTest {
         }
     };
 
+    @Autowired
+    protected UserMealService mealService;
+
+    @Test
+    public void testGet() throws Exception {
+        UserMeal actual = mealService.get(ADMIN_MEAL_ID, ADMIN_ID);
+        MEAL_MATCHER.assertEquals(ADMIN_MEAL, actual);
+    }
+
+    @Test
+    public void testGetNotFound() throws Exception {
+        thrown.expect(NotFoundException.class);
+        mealService.get(MEAL1_ID, ADMIN_ID);
+    }
+
+    @Test
+    public void testGetAll() throws Exception {
+        MEAL_MATCHER.assertCollectionEquals(USER_MEALS, mealService.getAll(USER_ID));
+    }
 
     @Test
     public void testDelete() throws Exception {
